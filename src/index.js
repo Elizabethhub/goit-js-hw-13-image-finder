@@ -2,6 +2,9 @@ import './sass/main.scss';
 import galleryCard from './tpl/cards.hbs';
 import debounce from 'lodash.debounce';
 import { alert, notice, info, success, error, defaultModules } from '@pnotify/core';
+import '@pnotify/core/dist/PNotify.css';
+import '@pnotify/mobile/dist/PNotifyMobile.css';
+import '@pnotify/core/dist/BrightTheme.css';
 import { fetchImages } from './service/apiService.js';
 
 const refs = {
@@ -21,14 +24,16 @@ function toSearchImg(e) {
 
   searchWord = e.currentTarget.elements.query.value;
   if (searchWord === '') {
+    refs.loadMoreBtn.classList.add('is-hidden');
     alert({
       text: 'Enter what would you like to find',
     });
     return;
   }
   page = 1;
-  refs.loadMoreBtn.classList.remove('is-hidden');
+
   fetchImages(searchWord).then(renderGallery);
+  refs.loadMoreBtn.classList.remove('is-hidden');
 }
 
 function toLoadMore() {
@@ -38,21 +43,25 @@ function toLoadMore() {
 
 function renderGallery({ hits }) {
   if (!hits.length) {
+    refs.loadMoreBtn.classList.add('is-hidden');
     handleError('No results by your request!');
     return;
   }
   refs.gallery.insertAdjacentHTML('beforeend', galleryCard(hits));
+
+  const element = document.querySelector('.gallery').lastElementChild;
+  element.scrollIntoView({
+    behavior: 'smooth',
+    block: 'end',
+  });
+
   errorRef.textContent = '';
 }
 
 function handleError(err) {
   errorRef.textContent = err;
 }
-// const element = document.querySelector('.photo-card');
-// element.scrollIntoView({
-//   behavior: 'smooth',
-//   block: 'end',
-// });
+
 // var hiddenElement = document.getElementById("box");
 // var btn = document.querySelector('.btn');
 
